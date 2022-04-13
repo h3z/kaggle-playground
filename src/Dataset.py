@@ -6,24 +6,25 @@ from glob import glob
 import IPython.display as ipd
 from itertools import cycle
 from typing import TYPE_CHECKING
+import config as C
 
 
 class Dataset:
     def __init__(self) -> None:
-        self._data_path = "../dataset/"
-
         self.train = self.rename_columns(
-            pd.read_pickle(f"{self._data_path}/pkl/train.pkl")
+            pd.read_pickle(f"{C.DATASET_PATH}/pkl/train.pkl")
         )
         self.test = self.rename_columns(
-            pd.read_pickle(f"{self._data_path}/pkl/test.pkl")
+            pd.read_pickle(f"{C.DATASET_PATH}/pkl/test.pkl")
         )
-        self.label = pd.read_csv(f"{self._data_path}/csv/train_labels.csv")
+        self.label = pd.read_csv(f"{C.DATASET_PATH}/csv/train_labels.csv")
 
     def submit_result(self, pred):
-        submit = pd.read_csv(f"{self._data_path}/csv/sample_submission.csv")
+        submit = pd.read_csv(f"{C.DATASET_PATH}/csv/sample_submission.csv")
         submit.iloc[:, 1] = pred
-        submit.to_csv(f"{self._data_path}/submit.csv", index=False)
+        file_path = f"{C.DATASET_PATH}/submit.csv"
+        submit.to_csv(file_path, index=False)
+        return file_path
 
     def rename_columns(self, df):
 
@@ -47,3 +48,11 @@ class Dataset:
         ]
 
         return df
+
+    @property
+    def sensor_cols(self):
+        return [f"sensor{i:02d}" for i in range(13)]
+
+    @property
+    def timesteps(self):
+        return self.train.step.nunique()
