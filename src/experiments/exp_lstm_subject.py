@@ -30,8 +30,8 @@ def lstm_model(timesteps, feature):
 
 
 class exp_lstm_subject(Experiment):
-    def __init__(self, run, ds: Dataset, params) -> None:
-        super().__init__(run, ds, params)
+    def __init__(self, callback, ds: Dataset, params) -> None:
+        super().__init__(callback, ds, params)
         self.model = lstm_model(ds.train.step.nunique(), len(ds.sensor_cols))
 
     def train(self):
@@ -48,7 +48,7 @@ class exp_lstm_subject(Experiment):
             xy.take(L),
             validation_data=xy.skip(L),
             epochs=self.params["epochs"],
-            callbacks=[C.neptune_callback(self.run)],
+            callbacks=[self.callback],
         )
 
         final_result = {}

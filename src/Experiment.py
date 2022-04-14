@@ -2,12 +2,10 @@ from Dataset import Dataset
 
 
 class Experiment:
-    def __init__(self, run, ds: Dataset, params) -> None:
-        self.run = run
+    def __init__(self, callback, ds: Dataset, params) -> None:
+        self.callback = callback
         self.ds = ds
         self.params = params
-        run["sys/name"] = self.name
-        run["sys/description"] = self.description
 
     def train(self):
         pass
