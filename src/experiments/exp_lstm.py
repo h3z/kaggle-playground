@@ -5,6 +5,7 @@ import tensorflow as tf
 from tensorflow import keras as k
 import typing
 import config as C
+import wandb
 
 if typing.TYPE_CHECKING:
     print("emmm")
@@ -20,8 +21,8 @@ def lstm_model(timesteps, feature):
 
 
 class exp_lstm(Experiment):
-    def __init__(self, callback, ds: Dataset, params) -> None:
-        super().__init__(callback, ds, params)
+    def __init__(self, ds: Dataset, params) -> None:
+        super().__init__(ds, params)
         self.model = lstm_model(ds.train.step.nunique(), len(ds.sensor_cols))
 
     def train(self):
@@ -37,7 +38,7 @@ class exp_lstm(Experiment):
             xy.take(L),
             validation_data=xy.skip(L),
             epochs=self.params["epochs"],
-            callbacks=[self.callback],
+            callbacks=[wandb.keras.WandbCallback()],
         )
 
         final_result = {}
