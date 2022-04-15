@@ -22,8 +22,8 @@ def run_exp(EXP: Type[Experiment]):
     wandb.log(final_result)
 
     preds = exp.predict()
+    ds.submit_result(preds)
 
-    file_path = ds.submit_result(preds)
     wandb.finish()
 
 
