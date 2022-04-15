@@ -1,14 +1,10 @@
-from numpy import fliplr
-from Experiment import Experiment
+from base_experiment import Experiment
 from experiments.exp_lstm_subject import exp_lstm_subject
-from experiments.exp_lstm import exp_lstm
 
-from Dataset import Dataset
+from dataset_util import Dataset
 import config as C
 import wandb
-import os
 from typing import Type
-from pathlib import Path
 
 
 def get_parameters():
@@ -28,23 +24,8 @@ def run_exp(EXP: Type[Experiment]):
     preds = exp.predict()
 
     file_path = ds.submit_result(preds)
-
-    for i in C.PROJECT_PATH.glob("**/*.py"):
-        if "wandb" in str(i):
-            continue
-        wandb.save(
-            str(i),
-            C.PROJECT_PATH,
-            policy="now",
-        )
-    wandb.save(file_path, Path(file_path).parent, "now")
     wandb.finish()
 
 
 if __name__ == "__main__":
-    # os.environ["http_proxy"] = "http://localhost:6152"
-    # os.environ["https_proxy"] = "http://localhost:6152"
-    # os.environ["NEPTUNE_ALLOW_SELF_SIGNED_CERTIFICATE"] = "TRUE"
-
-    # run_exp(exp_lstm)
     run_exp(exp_lstm_subject)
