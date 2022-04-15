@@ -8,12 +8,11 @@ import config as C
 import wandb
 import os
 from typing import Type
-import glob
 from pathlib import Path
 
 
 def get_parameters():
-    return {"lr": 0.001, "epochs": 200, "batch_size": 128}
+    return {"lr": 0.001, "epochs": 30, "batch_size": 128}
 
 
 def run_exp(EXP: Type[Experiment]):
@@ -43,9 +42,9 @@ def run_exp(EXP: Type[Experiment]):
 
 
 if __name__ == "__main__":
-    os.environ["http_proxy"] = "http://localhost:6152"
-    os.environ["https_proxy"] = "http://localhost:6152"
-    os.environ["NEPTUNE_ALLOW_SELF_SIGNED_CERTIFICATE"] = "TRUE"
+    # os.environ["http_proxy"] = "http://localhost:6152"
+    # os.environ["https_proxy"] = "http://localhost:6152"
+    # os.environ["NEPTUNE_ALLOW_SELF_SIGNED_CERTIFICATE"] = "TRUE"
 
-    run_exp(exp_lstm)
-    # run_exp(exp_lstm_subject)
+    # run_exp(exp_lstm)
+    run_exp(exp_lstm_subject)

@@ -6,6 +6,7 @@ class Experiment:
     def __init__(self, ds: Dataset, params) -> None:
         self.ds = ds
         self.params = params
+        print(params)
         wandb.run.name = self.name
         wandb.run.notes = self.description
 

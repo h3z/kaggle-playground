@@ -37,7 +37,7 @@ class exp_lstm_subject(Experiment):
 
     def train(self):
         self.model.compile(
-            optimizer=k.optimizers.Adam(),
+            optimizer=k.optimizers.Adam(learning_rate=self.params["lr"]),
             loss=k.losses.BinaryCrossentropy(),
             metrics=[k.metrics.BinaryAccuracy()],
         )
