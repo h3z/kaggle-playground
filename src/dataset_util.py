@@ -16,7 +16,7 @@ class Dataset:
     def submit_result(self, pred):
         submit = pd.read_csv(f"{C.DATASET_PATH}/csv/sample_submission.csv")
         submit.iloc[:, 1] = pred
-        file_path = f"{C.DATASET_PATH}/submit.csv"
+        file_path = C.DATASET_PATH / "submit.csv"
         submit.to_csv(file_path, index=False)
         return file_path
 

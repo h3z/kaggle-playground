@@ -1,5 +1,5 @@
-from Experiment import Experiment
-from Dataset import Dataset
+from base_experiment import Experiment
+from dataset_util import Dataset
 import tensorflow as tf
 
 from tensorflow import keras as k
