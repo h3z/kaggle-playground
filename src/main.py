@@ -1,3 +1,4 @@
+import torch
 from base_experiment import Experiment
 from experiments.exp_lstm_subject import exp_lstm_subject
 
@@ -5,10 +6,15 @@ from dataset_util import Dataset
 import config as C
 import wandb
 from typing import Type
+import random
+import tensorflow as tf
+
+random.seed(42)
+tf.random.set_seed(42)
 
 
 def get_parameters():
-    return {"lr": 0.001, "epochs": 30, "batch_size": 128}
+    return {"lr": 0.001, "epochs": 100, "batch_size": 64}
 
 
 def run_exp(EXP: Type[Experiment]):

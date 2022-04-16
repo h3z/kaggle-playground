@@ -7,8 +7,8 @@ class Experiment:
         self.ds = ds
         self.params = params
         print(params)
-        wandb.run.name = self.name
-        wandb.run.notes = self.description
+        # wandb.run.name = self.name
+        # wandb.run.notes = self.description
 
     def train(self):
         pass
