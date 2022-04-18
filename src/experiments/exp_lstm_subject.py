@@ -6,6 +6,9 @@ from tensorflow import keras as k
 import typing
 import config as C
 import wandb
+from sklearn.model_selection import GroupKFold
+import numpy as np
+import pandas as pd
 
 if typing.TYPE_CHECKING:
     print("emmm")
@@ -16,21 +19,24 @@ def lstm_model(timesteps, feature):
 
     input1 = k.layers.Input(shape=(timesteps, feature))
     x1 = k.layers.LSTM(32)(input1)
-    x1 = k.layers.Dense(16)(x1)
+    x1 = k.layers.Dense(16, activation="relu")(x1)
+    x1 = k.layers.BatchNormalization()(x1)
 
     input2 = k.layers.Input(shape=(1))
     x2 = k.layers.Embedding(1, 16)(input2)
+    x2 = k.layers.BatchNormalization()(x2)
     x2 = tf.squeeze(x2, axis=1)
 
     x = k.layers.Concatenate(axis=-1)([x1, x2])
-    x = k.layers.Dense(16)(x)
+    x = k.layers.Dense(16, activation="relu")(x)
+    x = k.layers.BatchNormalization()(x)
     output = k.layers.Dense(1, activation="sigmoid")(x)
 
     model = k.Model(inputs=[input1, input2], outputs=output)
     return model
 
 
-class exp_lstm_subject(Experiment):
+class EXP(Experiment):
     def __init__(self, ds: Dataset, params) -> None:
         super().__init__(ds, params)
         self.model = lstm_model(ds.train.step.nunique(), len(ds.sensor_cols))
@@ -42,12 +48,11 @@ class exp_lstm_subject(Experiment):
             metrics=[k.metrics.BinaryAccuracy()],
         )
 
-        xy = self.get_dataset()
-        L = int(len(xy) * 0.8)
+        train_xy, val_xy = self.get_dataset()
 
         history = self.model.fit(
-            xy.take(L),
-            validation_data=xy.skip(L),
+            train_xy,
+            validation_data=val_xy,
             epochs=self.params["epochs"],
             callbacks=[wandb.keras.WandbCallback()],
         )
@@ -58,34 +63,38 @@ class exp_lstm_subject(Experiment):
         return final_result
 
     def predict(self):
-        x = self.preprocess_x(self.ds.test)
+        x = self.preprocess(self.ds.test)
         preds = self.model.predict(x)
         return preds
 
     def get_dataset(self):
-        ds = self.ds
-        return (
-            tf.data.Dataset.from_tensor_slices(
-                (
-                    self.preprocess_x(ds.train),
-                    ds.label.state.values.reshape(-1, 1),
+        df = self.ds.train
+
+        def dataloader(idx, type):
+            temp = df.iloc[idx]
+            return (
+                tf.data.Dataset.from_tensor_slices(
+                    self.preprocess(temp, type),
                 )
+                .batch(self.params["batch_size"])
+                .shuffle(self.params["batch_size"] * 4)
             )
-            .batch(self.params["batch_size"])
-            .shuffle(self.params["batch_size"] * 4)
-        )
 
-    def preprocess_x(self, df):
-        ds = self.ds
+        train_idx, val_idx = next(GroupKFold(n_splits=5).split(df, groups=df.subject))
+        return dataloader(train_idx, "train"), dataloader(val_idx, "val")
 
-        x = (
-            # x: time series
-            df[ds.sensor_cols].values.reshape(-1, ds.timesteps, 13),
-            # x: subject
-            df.groupby("sequence").subject.first().values.reshape(-1, 1),
-        )
+    def preprocess(self, df, type="test"):
+        temp = df
 
-        return x
+        def f(cols):
+            return temp[cols].values.reshape(-1, self.ds.timesteps, len(cols))
+
+        if type != "test":
+            temp = pd.merge(temp, self.ds.label, on="sequence")
+            return (f(self.ds.sensor_cols), f(["subject"])[:, 0]), f(["state"])[:, 0]
+
+        else:
+            return (f(self.ds.sensor_cols), f(["subject"])[:, 0])
 
     @property
     def name(self):

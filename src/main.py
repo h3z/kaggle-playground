@@ -1,6 +1,8 @@
-import torch
 from base_experiment import Experiment
-from experiments.exp_lstm_subject import exp_lstm_subject
+
+from experiments.exp_lstm_subject import EXP as exp
+
+from experiments.exp_lstm_subject_count import EXP as exp2
 
 from dataset_util import Dataset
 import config as C
@@ -14,12 +16,10 @@ tf.random.set_seed(42)
 
 
 def get_parameters():
-    return {"lr": 0.001, "epochs": 100, "batch_size": 64}
+    return {"lr": 0.001, "epochs": 50, "batch_size": 256, "exp": 1}
 
 
 def run_exp(EXP: Type[Experiment]):
-    wandb.init(project="Tabular-Playground-Series-Apr-2022", entity="hzzz")
-    wandb.config.update(get_parameters())
 
     ds = Dataset()
     exp = EXP(ds, wandb.config)
@@ -34,4 +34,9 @@ def run_exp(EXP: Type[Experiment]):
 
 
 if __name__ == "__main__":
-    run_exp(exp_lstm_subject)
+    wandb.init(project="Tabular-Playground-Series-Apr-2022", entity="hzzz")
+    wandb.config.update(get_parameters())
+    if wandb.config.exp == 1:
+        run_exp(exp)
+    elif wandb.config.exp == 2:
+        run_exp(exp2)
