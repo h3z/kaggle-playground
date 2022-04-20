@@ -3,7 +3,7 @@ import numpy as np
 import config as C
 
 
-class Dataset:
+class DataReader:
     def __init__(self) -> None:
         self.train = self.rename_columns(
             pd.read_pickle(f"{C.DATASET_PATH}/pkl/train.pkl")
