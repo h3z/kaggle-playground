@@ -3,7 +3,6 @@ from tensorflow import keras as k
 import typing
 
 if typing.TYPE_CHECKING:
-    print("emmm")
     from keras.api._v2 import keras as k
 
 
