@@ -163,10 +163,9 @@ def train(
             loss = criterion(predict, batch[1].to(device).float())
             loss.backward()
             optimizer.step()
-            # sheduler.step()
+            sheduler.step()
             training_loss += loss.data.item()
         training_loss /= len(train_iterator)
-        print("lr", optimizer.param_groups[0]["lr"])
 
         model.eval()
 
@@ -178,6 +177,10 @@ def train(
 
         valid_loss /= len(valid_iterator)
 
+        print(
+            "Epoch: {}, Training Loss: {:.5f}, "
+            "Validation Loss: {:.5f}".format(epoch, training_loss, valid_loss)
+        )
         if epoch % 10 == 1:
             print(
                 "Epoch: {}, Training Loss: {:.5f}, "
@@ -218,10 +221,9 @@ optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 num_warmup_steps = int(0.1 * epochs * len(train_dataloader))
 num_training_steps = int(epochs * len(train_dataloader))
 
-# sheduler = get_linear_schedule_with_warmup(
-#     optimizer, num_warmup_steps, num_training_steps
-# )
-sheduler = None
+sheduler = get_linear_schedule_with_warmup(
+    optimizer, num_warmup_steps, num_training_steps
+)
 
 # criterion = nn.BCEWithLogitsLoss()
 criterion = nn.MSELoss()
