@@ -12,4 +12,4 @@ def get():
 
     if wandb.config.optimizer == "adam":
         # return k.optimizers.Adam(wandb.config.lr)
-        return k.optimizers.Adam(1e-7)
+        return k.optimizers.Adam(wandb.config.lr)

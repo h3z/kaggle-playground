@@ -33,8 +33,8 @@ def get_parameters():
     return {
         "lr": 0.0001,
         "epochs": 200,
-        # "batch_size": 64,
-        "batch_size": 512,
+        "batch_size": 64,
+        # "batch_size": 512,
         "optimizer": "adam",
         "split_type": 2,
         # 92, old
@@ -57,7 +57,12 @@ def scheduler(epoch, lr):
 
 
 def main():
-    wandb.init(project="TPS-Apr-2022", entity="hzzz", config=get_parameters())
+    wandb.init(
+        project="TPS-Apr-2022",
+        entity="hzzz",
+        config=get_parameters(),
+        dir="/wandb/tps-apr",
+    )
     print(wandb.config)
 
     # read data
@@ -70,7 +75,8 @@ def main():
     train_x_df, train_y_df, val_x_df, val_y_df = data_split.split(train_df, label_df)
 
     # preprocess
-    data_process = DataProcess(train_x_df)
+    # data_process = DataProcess(train_x_df)
+    data_process = DataProcess(train_df)
     train_x_df = data_process.preprocess(train_x_df)
     val_x_df = data_process.preprocess(val_x_df)
     test_x_df = data_process.preprocess(test_df)
@@ -83,14 +89,16 @@ def main():
     # model
     # model = exp0.lstm_model()
     model = models.get()
-    # model.summary()
+    model.build(input_shape=(128, 60, 13))
+    model.summary()
 
     # train
     model.compile(
         optimizer=optimizers.get(),
         # loss=k.losses.BinaryCrossentropy(from_logits=True),
+        # loss=k.losses.BinaryCrossentropy(from_logits=False),
         loss=k.losses.MeanSquaredError(),
-        metrics=[k.metrics.BinaryAccuracy()],
+        # metrics=[k.metrics.BinaryAccuracy(), k.metrics.AUC()],
     )
 
     history = model.fit(
@@ -99,7 +107,7 @@ def main():
         epochs=wandb.config.epochs,
         callbacks=[
             wandb.keras.WandbCallback(),
-            k.callbacks.LearningRateScheduler(scheduler),
+            # k.callbacks.LearningRateScheduler(scheduler),
         ],
     )
 

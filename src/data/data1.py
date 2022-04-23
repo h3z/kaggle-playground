@@ -13,9 +13,8 @@ class Data:
         x = self.process_x(x)
         y = y.state.values
         return (
-            tf.data.Dataset.from_tensor_slices((x, y))
-            .batch(wandb.config.batch_size)
-            .shuffle(wandb.config.batch_size * 4)
+            tf.data.Dataset.from_tensor_slices((x, y)).batch(wandb.config.batch_size)
+            # .shuffle(wandb.config.batch_size * 4)
         )
 
     def get_test_ds(self, x):
