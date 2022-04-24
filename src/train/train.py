@@ -18,8 +18,8 @@ def epoch_train(
     model.train()
 
     losses = []
-    for i, batch in tqdm(
-        enumerate(train_loader), total=len(train_loader), unit=" batch", desc="Epoch: "
+    for i, batch in (
+        pbar := tqdm(enumerate(train_loader), total=len(train_loader), unit=" batch")
     ):
         batch_x = batch[0].to(torch.float32).to("cuda")
         batch_y = batch[1].to(torch.float32).to("cuda")
@@ -32,9 +32,10 @@ def epoch_train(
         scheduler.step()
 
         losses.append(loss.item())
-
+        pbar.set_description(f"batch loss: {loss.item():.4f}")
         [cb.on_train_batch_end(pred_y, batch_y, loss.item()) for cb in callbacks]
 
+    pbar.set_description(f"{np.mean(losses):.4f}")
     return np.mean(losses)
 
 
