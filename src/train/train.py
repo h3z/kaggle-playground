@@ -63,7 +63,7 @@ def predict(model: torch.nn.Module, test_loader):
     for i, (batch_x, batch_y) in enumerate(test_loader):
         batch_x = batch_x.to(torch.float32).to("cuda")
         batch_y = batch_y.to(torch.float32).to("cuda")
-        pred_y = model.forward(batch_x, batch_y)
+        pred_y = model(batch_x)
 
         preds.append(pred_y.cpu().detach().numpy())
         gts.append(batch_y.cpu().detach().numpy())

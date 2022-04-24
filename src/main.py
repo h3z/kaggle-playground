@@ -1,4 +1,4 @@
-import wandb, utils, os, sys
+import wandb, utils, os, sys, warnings
 from model import models
 from data import data_split, data_process, data_loader, data_reader
 from train import train, losses, optimizers, schedulers
@@ -7,8 +7,8 @@ from config import config
 from config.config import sensor_cols
 from typing import List
 
-# sys.path.append("/home/yanhuize/kaggle/TPS-Apr/torch-baby")
-# os.chdir("/home/yanhuize/kaggle/TPS-Apr/torch-baby")
+# os.chdir("/home/yanhuize/kaggle/TPS-Apr/src")
+warnings.filterwarnings("ignore")
 utils.fix_random()
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -32,6 +32,7 @@ def main():
     data_util = data_reader.DataReader()
     train_df = data_util.train
     test_df = data_util.test
+    test_df["state"] = -1  # 为了对齐
 
     # split
     train_df, val_df, _ = data_split.split(train_df)
@@ -78,6 +79,7 @@ def main():
     # post process
     preds, gts = processor.postprocess(preds), processor.postprocess(gts)
 
+    data_util.submit(preds)
     wandb.finish()
 
 

@@ -25,6 +25,3 @@ class WandbCallback(Callback):
         wandb.log({"loss": loss, "val_loss": val_loss})
 
         return True
-
-    def on_train_finish(self, model: torch.nn.Module):
-        model.load_state_dict(self.best_state_dict)

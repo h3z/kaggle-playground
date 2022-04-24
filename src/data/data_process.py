@@ -11,5 +11,6 @@ class DataProcess:
     def preprocess(self, df: pd.DataFrame) -> pd.DataFrame:
         return self.scaler.transform(df.fillna(0).values)
 
-    def postprocess(self, preds: np.ndarray) -> np.ndarray:
-        return self.scaler.inverse_transform(preds)
+    def postprocess(self, arr: np.ndarray) -> np.ndarray:
+        # return self.scaler.inverse_transform(preds)
+        return arr
