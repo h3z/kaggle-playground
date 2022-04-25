@@ -3,6 +3,7 @@ import torch
 import wandb
 
 from callback.callback import Callback
+from sklearn import metrics
 
 
 class WandbCallback(Callback):
@@ -13,10 +14,15 @@ class WandbCallback(Callback):
         self.val_batch_losses = []
 
     def on_val_batch_end(self, preds: np.ndarray, gts: np.ndarray, loss):
-        pass
+        preds = preds.detach().cpu().numpy().squeeze()
+        gts = gts.detach().cpu().numpy().squeeze()
+        try:
+            wandb.log({"val_auc": metrics.roc_auc_score(preds > 0.5, gts)})
+        except:
+            wandb.log({"val_auc": 0})
+            return
 
     def on_train_batch_end(self, preds: np.ndarray, gts: np.ndarray, loss):
-        wandb.log({"max_pred": preds.max(), "max_gt": gts.max()})
         self.train_batch_losses.append(loss)
 
     def on_epoch_end(self, loss, val_loss, model: torch.nn.Module) -> bool:

@@ -2,6 +2,7 @@ import pandas as pd
 
 from config.config import DATA_PATH
 import numpy as np
+import wandb, utils
 
 
 class DataReader:
@@ -15,4 +16,7 @@ class DataReader:
 
     def submit(self, preds: np.ndarray):
         self.submission["state"] = preds.squeeze()
-        self.submission.to_csv("submit.csv", index=False)
+
+        f = utils.mktemp("submit.csv")
+        self.submission.to_csv(f, index=False)
+        wandb.save(f)

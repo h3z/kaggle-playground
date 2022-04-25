@@ -3,6 +3,7 @@ import torch
 import wandb
 
 from callback.callback import Callback
+import utils
 
 
 class EarlyStopping(Callback):
@@ -29,5 +30,8 @@ class EarlyStopping(Callback):
         return self.counter < self.patience
 
     def on_train_finish(self, model: torch.nn.Module):
-        torch.save(self.best_state_dict, "./test.h5")
         model.load_state_dict(self.best_state_dict)
+
+        f = utils.mktemp("best_model.pth")
+        torch.save(self.best_state_dict, f)
+        wandb.save(f)

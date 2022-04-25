@@ -10,7 +10,7 @@ from typing import List
 # os.chdir("/home/yanhuize/kaggle/TPS-Apr/src")
 warnings.filterwarnings("ignore")
 utils.fix_random()
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 def get_parameters():
@@ -21,6 +21,9 @@ def get_parameters():
         "~early_stopping_patience": 3,
         "~optimizer": "adam",
         "~loss": "mse",
+        "layer": 6,
+        "hidden_size": 512,
+        "bidirectional": True,
     }
 
 
