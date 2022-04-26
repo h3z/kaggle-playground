@@ -18,11 +18,11 @@ def get_parameters():
         "~lr": 0.0001,
         "~batch_size": 128,
         "~epochs": 200,
-        "~early_stopping_patience": 3,
+        "~early_stopping_patience": 10,
         "~optimizer": "adam",
-        "~loss": "mse",
+        "~loss": "bce",  # bce, mse
         "layer": 6,
-        "hidden_size": 512,
+        "hidden_size": 256,
         "bidirectional": True,
     }
 

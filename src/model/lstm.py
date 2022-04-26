@@ -22,6 +22,7 @@ class LSTM(nn.Module):
         self.logits = nn.Sequential(
             nn.ReLU(),
             nn.Linear(lstm_dim * seq_num * 2, 1),
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
