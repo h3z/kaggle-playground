@@ -1,9 +1,8 @@
 import pandas as pd
 import numpy as np
 from typing import List
-import torch
-import random
-import wandb
+import wandb, random, torch
+from config import config
 
 
 class DataLoader:
@@ -37,7 +36,7 @@ class DataLoader:
             return self.len
 
     def __init__(self, df: pd.DataFrame) -> None:
-        self.data = df.loc[:, "sensor_00":].values
+        self.data = df.loc[:, config.sensor_cols + ["state"]].values
 
     def get(self, is_train=False) -> torch.utils.data.DataLoader:
         dataset = self.Dataset(self.data)
