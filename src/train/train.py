@@ -14,6 +14,7 @@ def epoch_train(
     train_loader,
     criterion,
     callbacks: List[Callback] = [],
+    device="cuda",
 ):
     model.train()
 
@@ -21,8 +22,8 @@ def epoch_train(
     for i, batch in (
         pbar := tqdm(enumerate(train_loader), total=len(train_loader), unit=" batch")
     ):
-        batch_x = batch[0].to(torch.float32).to("cuda")
-        batch_y = batch[1].to(torch.float32).to("cuda")
+        batch_x = batch[0].to(torch.float32).to(device)
+        batch_y = batch[1].to(torch.float32).to(device)
 
         optimizer.zero_grad()
         pred_y = model(batch_x)
@@ -39,14 +40,18 @@ def epoch_train(
 
 
 def epoch_val(
-    model: torch.nn.Module, val_loader, criterion, callbacks: List[Callback] = []
+    model: torch.nn.Module,
+    val_loader,
+    criterion,
+    callbacks: List[Callback] = [],
+    device="cuda",
 ):
     model.eval()
 
     losses = []
     for i, batch in enumerate(val_loader):
-        batch_x = batch[0].to(torch.float32).to("cuda")
-        batch_y = batch[1].to(torch.float32).to("cuda")
+        batch_x = batch[0].to(torch.float32).to(device)
+        batch_y = batch[1].to(torch.float32).to(device)
         pred_y = model(batch_x)
         loss = criterion(pred_y, batch_y)
         losses.append(loss.item())
@@ -55,13 +60,17 @@ def epoch_val(
     return np.mean(losses)
 
 
-def predict(model: torch.nn.Module, test_loader):
+def predict(
+    model: torch.nn.Module,
+    test_loader,
+    device="cuda",
+):
     model.eval()
     preds = []
     gts = []
     for i, (batch_x, batch_y) in enumerate(test_loader):
-        batch_x = batch_x.to(torch.float32).to("cuda")
-        batch_y = batch_y.to(torch.float32).to("cuda")
+        batch_x = batch_x.to(torch.float32).to(device)
+        batch_y = batch_y.to(torch.float32).to(device)
         pred_y = model(batch_x)
 
         preds.append(pred_y.cpu().detach().numpy())

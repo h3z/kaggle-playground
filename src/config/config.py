@@ -1,5 +1,5 @@
 PROJECT_NAME = "TPS-Apr-2022"
-ONLINE = True
+ONLINE = False
 
 __wandb__ = {
     "project": PROJECT_NAME,
